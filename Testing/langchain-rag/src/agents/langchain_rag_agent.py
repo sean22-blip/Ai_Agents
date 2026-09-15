@@ -13,7 +13,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import CohereRerank
-from ai_engine import UAgentResponse, UAgentResponseType
+from messages.ai_engine_compat import UAgentResponse, UAgentResponseType
 import nltk
 from uagents.setup import fund_agent_if_low
  
@@ -25,9 +25,10 @@ LANGCHAIN_RAG_SEED = "YOUR_LANGCHAIN_RAG_SEED"
 agent = Agent(
     name="langchain_rag_agent",
     seed=LANGCHAIN_RAG_SEED,
-    mailbox=True,
+    port=8000,
+    endpoint=["http://127.0.0.1:8000/submit"],
 )
- 
+
 fund_agent_if_low(agent.wallet.address())
  
 docs_bot_protocol = Protocol("DocsBot")
