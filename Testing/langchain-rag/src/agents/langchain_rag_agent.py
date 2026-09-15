@@ -3,7 +3,7 @@ from uagents import Agent, Context, Protocol
 import validators
 from messages.requests import RagRequest
 import os
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import UnstructuredURLLoader
 import requests
@@ -16,10 +16,11 @@ from langchain.retrievers.document_compressors import CohereRerank
 from messages.ai_engine_compat import UAgentResponse, UAgentResponseType
 import nltk
 from uagents.setup import fund_agent_if_low
- 
+from dotenv import load_dotenv
+load_dotenv()
 nltk.download("punkt")
 nltk.download("averaged_perceptron_tagger")
- 
+
 LANGCHAIN_RAG_SEED = "YOUR_LANGCHAIN_RAG_SEED"
  
 agent = Agent(
@@ -82,7 +83,7 @@ def create_retriever(
     try:
         loader = UnstructuredURLLoader(urls=urls)
         docs = loader.load_and_split()
-        db = FAISS.from_documents(docs, OpenAIEmbeddings())
+        db = FAISS.from_documents(docs, GoogleGenerativeAIEmbeddings(model="models/text-embedding-004"))
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=CohereRerank(), base_retriever=db.as_retriever()
         )
@@ -120,7 +121,7 @@ async def answer_question(ctx: Context, sender: str, msg: RagRequest):
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=msg.question)
  
-    model = ChatOpenAI(model="gpt-4o-mini")
+    model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")    
     response = model.predict(prompt)
     ctx.logger.info(f"Response: {response}")
     await ctx.send(

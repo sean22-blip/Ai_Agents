@@ -17,7 +17,7 @@ RAG_AGENT_ADDRESS = "agent1qvkzfgnpx2vvpw85h4dxmz297deluye2edspg39jyld3l4smrhcrq
 user = Agent(
     name="langchain_rag_user",
     port=8001,
-    endpoint=["http://127.0.0.1:8000/submit"],
+    endpoint=["http://127.0.0.1:8001/submit"],
 )
 fund_agent_if_low(user.wallet.address())
 rag_user = Protocol("LangChain RAG user")

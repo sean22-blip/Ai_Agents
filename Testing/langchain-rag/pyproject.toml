@@ -22,9 +22,9 @@ unstructured = "^0.16.5"
 langchain-community = "^0.3.21"
 uagents-ai-engine = "^0.10.0"
 uagents = "^0.22.3"
-uagents-adapter = "^0.4.1"
 langgraph = "^0.3.31"
 python-dotenv = "^1.0.1"
+langchain-google-genai = "^2.0.10"
 
 [tool.poetry]
 packages = [{include = "messages", from = "src"}]
