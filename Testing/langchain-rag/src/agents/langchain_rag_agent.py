@@ -83,10 +83,15 @@ def create_retriever(
     try:
         loader = UnstructuredURLLoader(urls=urls)
         docs = loader.load_and_split()
-        db = FAISS.from_documents(docs, GoogleGenerativeAIEmbeddings(model="models/text-embedding-004"))
-        compression_retriever = ContextualCompressionRetriever(
-            base_compressor=CohereRerank(), base_retriever=db.as_retriever()
-        )
+        db = FAISS.from_documents(
+    docs,
+    GoogleGenerativeAIEmbeddings(
+        model="models/gemini-embedding-001",
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
+    ),
+)
+        base_compressor=CohereRerank(model="rerank-v3.5"),
+        base_retriever=db.as_retriever(),
         return compression_retriever
     except Exception as exc:
         ctx.logger.error(f"Error happened: {exc}")
@@ -120,8 +125,11 @@ async def answer_question(ctx: Context, sender: str, msg: RagRequest):
     context_text = "\n\n---\n\n".join([doc.page_content for doc in compressed_docs])
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=msg.question)
- 
-    model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")    
+
+    model = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+)
     response = model.predict(prompt)
     ctx.logger.info(f"Response: {response}")
     await ctx.send(
